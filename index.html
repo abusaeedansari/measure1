@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Measurement 1</title>
+  <link rel="shortcut icon" href="scale.png" type="image/png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+  height: 100%;
+}
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #F4EEFF;
+      color: #424874;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh; /* Ensures body is at least the height of the viewport */
+    }
+    header {
+      text-align: center; 
+      padding: 20px; 
+      background-color: #424874; 
+      color: #F4EEFF;
+      margin-bottom: 30px;
+    }
+    header h1 { 
+      font-size: 2.5em; 
+      margin: 0; 
+    }
+    .container {
+      max-width: 800px; 
+      margin: 0 auto; 
+      background: #DCD6F7; 
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      overflow: hidden; 
+      padding: 30px; 
+    }
+    .hidden { display: none; }
+    .intro { text-align: center; }
+    .intro h2 {
+      color: #424874;
+      margin-bottom: 20px;
+      font-size: 2em;
+    }
+    .intro p {
+      font-size: 1.2em; 
+      line-height: 1.6em; 
+      margin: 20px 0;
+      color: #424874;
+    }
+    .name-input { 
+      margin: 20px 0; 
+      display: flex;
+      justify-content: center;
+    }
+    .name-input input {
+      width: 220px; 
+      padding: 18px 18px; 
+      font-size: 1.2em;
+      border: 2px solid #A6B1E1; 
+      border-radius: 8px;
+      outline: none;
+      transition: border 0.3s ease;
+      height: 40px;
+    }
+    .name-input input:focus {
+      border-color: #DCD6F7;
+    }
+    .button {
+      background: #424874; 
+      color: #F4EEFF; 
+      border: none; 
+      padding: 15px 25px;
+      font-size: 1.1em; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      margin: 20px 0;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .button:hover { 
+      background: #52598e; 
+      transform: scale(1.05);
+      color: #fff;
+    }
+    .quiz-area {}
+    .top-info {
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between;
+      margin-bottom: 25px; 
+      flex-wrap: wrap; 
+      gap: 15px;
+    }
+    .scoreboard, .timer {
+      font-weight: bold; 
+      color: #424874; 
+      font-size: 1.2em;
+    }
+    .progress-bar {
+      flex:1; 
+      background:#A6B1E1; 
+      height: 15px; 
+      border-radius: 8px; 
+      position: relative;
+      overflow: hidden; 
+      margin: 0 15px;
+    }
+    .progress-fill {
+      background: #424874; 
+      width: 0%; 
+      height: 100%; 
+      transition: width 0.3s ease;
+    }
+    .question-count {
+      text-align: center; 
+      font-weight: bold; 
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      color: #424874;
+    }
+    .question-text {
+      text-align: center; 
+      font-size: 1.4em; 
+      font-weight: bold; 
+      margin: 25px 0;
+      color: #424874;
+    }
+    .answers {
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      margin-bottom: 20px;
+    }
+    .answers label {
+      margin-bottom:15px; 
+      background:#F4EEFF; 
+      padding:15px; 
+      border-radius:8px;
+      border: 2px solid #A6B1E1; 
+      width: 100%; 
+      max-width: 500px;
+      cursor: pointer; 
+      transition: background 0.3s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      font-size: 1.2em;
+    }
+    .answers label:hover { 
+      background: #DCD6F7; 
+      transform: translateY(-2px);
+    }
+    .answers input[type="radio"] { 
+      margin-right: 15px; 
+      transform: scale(1.2);
+    }
+    .feedback {
+      text-align: center; 
+      font-weight: bold; 
+      padding: 15px; 
+      border-radius: 8px;
+      margin-bottom: 15px; 
+      max-width: 500px; 
+      margin: 0 auto 20px;
+      font-size: 1.2em;
+    }
+    .feedback.correct { 
+      background: #DCD6F7; 
+      border:2px solid #424874; 
+      color:#424874; 
+    }
+    .feedback.incorrect { 
+      background: #DCD6F7; 
+      border:2px solid #424874; 
+      color:#424874; 
+    }
+    .explanation {
+      font-size: 1.2em; 
+      background: #DCD6F7; 
+      border: 2px solid #A6B1E1;
+      border-radius: 8px; 
+      padding:15px; 
+      margin-bottom: 20px;
+      text-align: left; 
+      max-width: 600px; 
+      margin: 0 auto 25px;
+      color: #424874;
+    }
+    .result-area { 
+      text-align: center; 
+    }
+    .result-area h2 {
+      font-size: 2em;
+      color: #424874;
+      margin-bottom: 20px;
+    }
+    .result-area p { 
+      margin: 10px 0; 
+      font-size: 1.2em;
+      color: #424874;
+    }
+    footer { 
+      text-align: center; 
+      margin-top: auto;
+      padding: 20px; 
+      background-color: #424874; 
+      color: #F4EEFF; 
+      font-size: 1em;
+    }
+    @media(max-width:800px){
+      .container {
+        padding: 20px;
+      }
+      .question-text {
+        font-size: 1.3em;
+      }
+      .answers label {
+        font-size: 1.18em;
+      }
+      .button {
+        font-size: 1em;
+        padding: 12px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Measurement 1</h1>
+  </header>
+  <div class="container">
+    <div class="intro" id="intro">
+      <h2>Welcome!</h2>
+      <p>
+        This interactive quiz tests your understanding of when to use <strong>centimeters</strong>,
+        <strong>meters</strong>, and <strong>kilometers</strong>. You have <strong>12 minutes</strong> to complete the quiz. Good luck!
+      </p>
+      <div class="name-input">
+        <input type="text" id="playerName" placeholder="Enter your name"/>
+      </div>
+      <button class="button" onclick="startQuiz()">Start Quiz</button>
+    </div>
+    <div class="quiz-area hidden" id="quiz-area">
+      <div class="top-info">
+        <div class="timer" id="timer">Time: 12:00</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="scoreboard" id="scoreboard">Score: 0</div>
+      </div>
+      <div class="question-count" id="question-count">Question 1 of 30</div>
+      <div class="question-text" id="question-text">Question text goes here</div>
+      <div class="answers hidden" id="answers"></div>
+      <div class="feedback hidden" id="feedback"></div>
+      <div class="explanation hidden" id="explanation"></div>
+      <div style="text-align:center;">
+        <button class="button" id="mainBtn" onclick="mainButtonClicked()">Check Answer</button>
+      </div>
+    </div>
+    <div class="result-area hidden" id="result-area">
+      <h2>Quiz Completed!</h2>
+      <p id="final-message">Well done, Player!</p>
+      <p id="final-score">Your final score: 0 out of 300</p>
+      <p>Thank you for playing! Keep practicing and exploring measurements!</p>
+    </div>
+  </div>
+  <footer>
+    <p>Happy Learning!</p>
+  </footer>
+  <script>
+    function shuffleArray(arr) {
+      for(let i=arr.length-1; i>0; i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+    const questions = [
+  // Part 1 MC Questions
+  {
+    question: "What is the most suitable unit to measure the length of a pencil?",
+    type: "mc",
+    options: ["centimeter (cm)", "meter (m)", "kilometer (km)"],
+    correctIndex: 0,
+    explanation: "A pencil is typically measured in centimeters."
+  },
+  {
+    question: "The distance between two big cities is usually measured in:",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 2,
+    explanation: "Distances between large cities span tens or hundreds of kilometers."
+  },
+  {
+    question: "Which unit would you use to measure your classroom’s length?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 1,
+    explanation: "A classroom's length is usually in a few meters."
+  },
+  {
+    question: "The distance from India to Sri Lanka is best measured in:",
+    type: "mc",
+    options: ["meters", "centimeters", "kilometers"],
+    correctIndex: 2,
+    explanation: "Countries are separated by distances that are typically in kilometers."
+  },
+  {
+    question: "Which unit would you use to measure the height of a single-story building?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 1,
+    explanation: "A building's height is typically a few meters."
+  },
+  {
+    question: "Which unit is best for measuring the length of a smartphone?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 0,
+    explanation: "Phones are typically ~15 cm tall."
+  },
+  {
+    question: "Which unit would you use to measure the width of a road?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 1,
+    explanation: "Road width is usually a few meters."
+  },
+  {
+    question: "Which unit would you use to measure the height of a tree?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 1,
+    explanation: "Trees are generally some meters tall."
+  },
+  {
+    question: "The distance of a marathon is usually measured in:",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 2,
+    explanation: "Marathons are about 42 km in distance."
+  },
+  {
+    question: "Which unit is best for measuring the length of a bed?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 1,
+    explanation: "Beds are typically a couple of meters in length."
+  },
+  {
+    question: "The height of a basketball hoop is about 3.05 of which unit?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 1,
+    explanation: "Official basketball hoop height is about 3.05 meters."
+  },
+  {
+    question: "Which scenario is best for 'centimeters' measurement?",
+    type: "mc",
+    options: [
+      "Measuring a coin’s diameter",
+      "Measuring a classroom",
+      "Measuring the distance between cities"
+    ],
+    correctIndex: 0,
+    explanation: "Coins are measured in centimeters."
+  },
+  {
+    question: "Which unit best describes your body height?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 1,
+    explanation: "We often say 'I am 1.7 meters tall'."
+  },
+  {
+    question: "Which unit would you use to measure the height of Burj Khalifa?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 1,
+    explanation: "The Burj Khalifa is about 828 meters tall."
+  },
+  {
+    question: "Which unit would you use to measure the distance between Mumbai and Delhi?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 2,
+    explanation: "Mumbai to Delhi is roughly 1400 km."
+  },
+  {
+    question: "Which unit would you use to measure the height of the Statue of Unity in India?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 1,
+    explanation: "Statue of Unity is about 182 meters tall."
+  },
+  {
+    question: "Which unit would you use to measure the length of the Great Wall of China?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 2,
+    explanation: "The Great Wall is over 21,000 km long."
+  },
+  {
+    question: "Which unit would you use to measure the height of the Eiffel Tower?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 1,
+    explanation: "Eiffel Tower is ~324 meters tall."
+  },
+  {
+    question: "Which unit would you use to measure the height of the tallest bird, the Ostrich?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex: 1,
+    explanation: "Ostriches can be nearly 2.8 meters tall."
+  },
+  {
+    question: "The length of a football pitch is usually measured in:",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex:1,
+    explanation: "Football pitch length is typically in meters."
+  },
+  {
+    question: "Which unit is best for measuring the height of a door?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex:1,
+    explanation: "Doors are measured in meters."
+  },
+  {
+    question: "Which unit would you use to measure the length of a hallway?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex:1,
+    explanation: "Hallways are measured in meters."
+  },
+  {
+    question: "The distance between the Earth and the International Space Station is approximately:",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex:2,
+    explanation: "The ISS orbits approximately 400 km above Earth."
+  },
+  {
+    question: "What unit would you use to measure the length of a ruler?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex:0,
+    explanation: "Rulers are typically 30 centimeters long."
+  },
+  {
+    question: "Which unit is most appropriate for measuring the height of a giraffe?",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex:1,
+    explanation: "Giraffes are several meters tall."
+  },
+  {
+    question: "The distance a bicycle travels in one hour is best measured in:",
+    type: "mc",
+    options: ["centimeters", "meters", "kilometers"],
+    correctIndex:2,
+    explanation: "Bicycles travel kilometers in an hour."
+  }
+];
+shuffleArray(questions);
+    const totalQuestions = 30;
+    let totalTime = 720; // 12 minutes in seconds
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let playerName = "";
+    let mode = "check";
+    let timerInterval = null;
+    const introDiv        = document.getElementById("intro");
+    const quizAreaDiv     = document.getElementById("quiz-area");
+    const resultAreaDiv   = document.getElementById("result-area");
+    const playerNameInput = document.getElementById("playerName");
+    const timerEl         = document.getElementById("timer");
+    const scoreboardEl    = document.getElementById("scoreboard");
+    const progressFillEl  = document.getElementById("progress-fill");
+    const questionCountEl = document.getElementById("question-count");
+    const questionTextEl  = document.getElementById("question-text");
+    const answersDiv      = document.getElementById("answers");
+    const feedbackEl      = document.getElementById("feedback");
+    const explanationEl   = document.getElementById("explanation");
+    const mainBtn         = document.getElementById("mainBtn");
+    const finalMessageEl  = document.getElementById("final-message");
+    const finalScoreEl    = document.getElementById("final-score");
+    const selectedAnswers = [];
+    function startQuiz(){
+      const nameVal = playerNameInput.value.trim();
+      if(!nameVal){
+        alert("Please enter your name first.");
+        return;
+      }
+      playerName = nameVal;
+      introDiv.classList.add("hidden");
+      quizAreaDiv.classList.remove("hidden");
+      startTimer();
+      showQuestion();
+    }
+    function startTimer(){
+      updateTimerUI();
+      timerInterval = setInterval(()=>{
+        totalTime--;
+        if(totalTime <= 0){
+          clearInterval(timerInterval);
+          endQuiz();
+          return;
+        }
+        updateTimerUI();
+      },1000);
+    }
+    function updateTimerUI(){
+      const minutes = Math.floor(totalTime / 60);
+      const seconds = totalTime % 60;
+      timerEl.textContent = `Time: ${minutes}:${seconds < 10 ? "0"+seconds : seconds}`;
+    }
+    function showQuestion(){
+      feedbackEl.classList.add("hidden");
+      explanationEl.classList.add("hidden");
+      feedbackEl.textContent = "";
+      explanationEl.textContent = "";
+      answersDiv.classList.add("hidden");
+      answersDiv.innerHTML = "";
+      mainBtn.textContent = "Check Answer";
+      mode = "check";
+      let q = questions[currentQuestionIndex];
+      questionCountEl.textContent = "Question " + (currentQuestionIndex+1) + " of " + totalQuestions;
+      questionTextEl.textContent = q.question;
+      let progressPercent = Math.round(((currentQuestionIndex) / totalQuestions) * 100);
+      progressFillEl.style.width = progressPercent + "%";
+      if(q.type === "mc"){
+        answersDiv.classList.remove("hidden");
+        q.options.forEach((opt,i)=>{
+          let lbl = document.createElement("label");
+          let inp = document.createElement("input");
+          inp.type = "radio";
+          inp.name = "answer";
+          inp.value = i;
+          lbl.appendChild(inp);
+          lbl.appendChild(document.createTextNode(" " + opt));
+          answersDiv.appendChild(lbl);
+        });
+      }
+    }
+    function mainButtonClicked(){
+      if(mode === "check"){
+        checkAnswer();
+      } else {
+        nextQuestion();
+      }
+    }
+    function checkAnswer(){
+      let q = questions[currentQuestionIndex];
+      let isCorrect = false;
+      if(q.type === "mc"){
+        let selected = document.querySelector('input[name="answer"]:checked');
+        if(!selected){
+          alert("Please select an answer.");
+          return;
+        }
+        let chosenIndex = Number(selected.value);
+        isCorrect = (chosenIndex === q.correctIndex);
+        selectedAnswers.push(chosenIndex);
+      }
+      if(isCorrect) score += 10;
+      scoreboardEl.textContent = "Score: " + score;
+      feedbackEl.classList.remove("hidden");
+      feedbackEl.textContent = isCorrect ? "Correct!" : "Incorrect!";
+      feedbackEl.classList.remove("correct","incorrect");
+      feedbackEl.classList.add(isCorrect ? "correct" : "incorrect");
+      explanationEl.classList.remove("hidden");
+      if(isCorrect){
+        explanationEl.textContent = q.explanation || "";
+      } else {
+        let ans = q.options[q.correctIndex];
+        explanationEl.textContent = `Correct Answer: ${ans}. ${q.explanation ? q.explanation : ""}`;
+      }
+      mainBtn.textContent = "Next Question";
+      mode = "next";
+      let progressPercent = Math.round(((currentQuestionIndex +1) / totalQuestions) * 100);
+      progressFillEl.style.width = progressPercent + "%";
+    }
+    function nextQuestion(){
+      currentQuestionIndex++;
+      if(currentQuestionIndex >= totalQuestions){
+        endQuiz();
+      } else {
+        showQuestion();
+      }
+    }
+    function endQuiz(){
+      clearInterval(timerInterval);
+      quizAreaDiv.classList.add("hidden");
+      resultAreaDiv.classList.remove("hidden");
+      finalMessageEl.textContent = `Well done, ${playerName}!`;
+      finalScoreEl.textContent = `Your final score: ${score} out of ${totalQuestions * 10}`;
+    }
+  </script>
+</body>
+</html>
