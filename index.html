@@ -8,15 +8,15 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-  height: 100%;
-}
+      height: 100%;
+    }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #F4EEFF;
       color: #424874;
       display: flex;
       flex-direction: column;
-      min-height: 100vh; /* Ensures body is at least the height of the viewport */
+      min-height: 100vh;
     }
     header {
       text-align: center; 
@@ -51,22 +51,25 @@
       margin: 20px 0;
       color: #424874;
     }
-    .name-input { 
-      margin: 20px 0; 
+    .input-group { 
+      margin: 15px 0; 
       display: flex;
       justify-content: center;
+      flex-direction: column;
+      align-items: center;
     }
-    .name-input input {
+    .input-group input, .input-group select {
       width: 220px; 
-      padding: 18px 18px; 
-      font-size: 1.2em;
+      padding: 10px 18px; 
+      font-size: 1.15em;
       border: 2px solid #A6B1E1; 
       border-radius: 8px;
       outline: none;
       transition: border 0.3s ease;
-      height: 40px;
+      margin-bottom: 10px;
+      height: 50px;
     }
-    .name-input input:focus {
+    .input-group input:focus, .input-group select:focus {
       border-color: #DCD6F7;
     }
     .button {
@@ -201,6 +204,23 @@
       font-size: 1.2em;
       color: #424874;
     }
+    .scoreboard-table {
+      width: 100%;
+      max-width: 700px;
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    .scoreboard-table th, .scoreboard-table td {
+      border: 1px solid #A6B1E1;
+      padding: 10px;
+      text-align: center;
+      font-size: 1em;
+    }
+    .scoreboard-table th {
+      background-color: #424874;
+      color: #F4EEFF;
+    }
+  
     footer { 
       text-align: center; 
       margin-top: auto;
@@ -223,8 +243,15 @@
         font-size: 1em;
         padding: 12px 20px;
       }
+      .scoreboard-table th, .scoreboard-table td {
+        font-size: 0.9em;
+        padding: 8px;
+      }
     }
   </style>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
   <header>
@@ -237,8 +264,14 @@
         This interactive quiz tests your understanding of when to use <strong>centimeters</strong>,
         <strong>meters</strong>, and <strong>kilometers</strong>. You have <strong>12 minutes</strong> to complete the quiz. Good luck!
       </p>
-      <div class="name-input">
+      <div class="input-group">
         <input type="text" id="playerName" placeholder="Enter your name"/>
+        <select id="division">
+          <option value="" disabled selected>Select Division</option>
+          <option value="A">Division A</option>
+          <option value="B">Division B</option>
+        </select>
+        <input type="number" id="rollNo" placeholder="Enter Roll Number"/>
       </div>
       <button class="button" onclick="startQuiz()">Start Quiz</button>
     </div>
@@ -268,6 +301,21 @@
     <p>Happy Learning!</p>
   </footer>
   <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-RDLOoTlaio0VgtFh7eencMr9ekdFEEk",
+      authDomain: "test-app-1-6ade5.firebaseapp.com",
+      databaseURL: "https://test-app-1-6ade5-default-rtdb.firebaseio.com",
+      projectId: "test-app-1-6ade5",
+      storageBucket: "test-app-1-6ade5.firebasestorage.app",
+      messagingSenderId: "938447574937",
+      appId: "1:938447574937:web:65c1c53a12c665988b2508",
+      measurementId: "G-FKNLFZH4G9"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
     function shuffleArray(arr) {
       for(let i=arr.length-1; i>0; i--){
         const j=Math.floor(Math.random()*(i+1));
@@ -275,206 +323,240 @@
       }
     }
     const questions = [
-  // Part 1 MC Questions
-  {
-    question: "What is the most suitable unit to measure the length of a pencil?",
-    type: "mc",
-    options: ["centimeter (cm)", "meter (m)", "kilometer (km)"],
-    correctIndex: 0,
-    explanation: "A pencil is typically measured in centimeters."
-  },
-  {
-    question: "The distance between two big cities is usually measured in:",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 2,
-    explanation: "Distances between large cities span tens or hundreds of kilometers."
-  },
-  {
-    question: "Which unit would you use to measure your classroom’s length?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 1,
-    explanation: "A classroom's length is usually in a few meters."
-  },
-  {
-    question: "The distance from India to Sri Lanka is best measured in:",
-    type: "mc",
-    options: ["meters", "centimeters", "kilometers"],
-    correctIndex: 2,
-    explanation: "Countries are separated by distances that are typically in kilometers."
-  },
-  {
-    question: "Which unit would you use to measure the height of a single-story building?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 1,
-    explanation: "A building's height is typically a few meters."
-  },
-  {
-    question: "Which unit is best for measuring the length of a smartphone?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 0,
-    explanation: "Phones are typically ~15 cm tall."
-  },
-  {
-    question: "Which unit would you use to measure the width of a road?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 1,
-    explanation: "Road width is usually a few meters."
-  },
-  {
-    question: "Which unit would you use to measure the height of a tree?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 1,
-    explanation: "Trees are generally some meters tall."
-  },
-  {
-    question: "The distance of a marathon is usually measured in:",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 2,
-    explanation: "Marathons are about 42 km in distance."
-  },
-  {
-    question: "Which unit is best for measuring the length of a bed?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 1,
-    explanation: "Beds are typically a couple of meters in length."
-  },
-  {
-    question: "The height of a basketball hoop is about 3.05 of which unit?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 1,
-    explanation: "Official basketball hoop height is about 3.05 meters."
-  },
-  {
-    question: "Which scenario is best for 'centimeters' measurement?",
-    type: "mc",
-    options: [
-      "Measuring a coin’s diameter",
-      "Measuring a classroom",
-      "Measuring the distance between cities"
-    ],
-    correctIndex: 0,
-    explanation: "Coins are measured in centimeters."
-  },
-  {
-    question: "Which unit best describes your body height?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 1,
-    explanation: "We often say 'I am 1.7 meters tall'."
-  },
-  {
-    question: "Which unit would you use to measure the height of Burj Khalifa?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 1,
-    explanation: "The Burj Khalifa is about 828 meters tall."
-  },
-  {
-    question: "Which unit would you use to measure the distance between Mumbai and Delhi?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 2,
-    explanation: "Mumbai to Delhi is roughly 1400 km."
-  },
-  {
-    question: "Which unit would you use to measure the height of the Statue of Unity in India?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 1,
-    explanation: "Statue of Unity is about 182 meters tall."
-  },
-  {
-    question: "Which unit would you use to measure the length of the Great Wall of China?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 2,
-    explanation: "The Great Wall is over 21,000 km long."
-  },
-  {
-    question: "Which unit would you use to measure the height of the Eiffel Tower?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 1,
-    explanation: "Eiffel Tower is ~324 meters tall."
-  },
-  {
-    question: "Which unit would you use to measure the height of the tallest bird, the Ostrich?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex: 1,
-    explanation: "Ostriches can be nearly 2.8 meters tall."
-  },
-  {
-    question: "The length of a football pitch is usually measured in:",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex:1,
-    explanation: "Football pitch length is typically in meters."
-  },
-  {
-    question: "Which unit is best for measuring the height of a door?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex:1,
-    explanation: "Doors are measured in meters."
-  },
-  {
-    question: "Which unit would you use to measure the length of a hallway?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex:1,
-    explanation: "Hallways are measured in meters."
-  },
-  {
-    question: "The distance between the Earth and the International Space Station is approximately:",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex:2,
-    explanation: "The ISS orbits approximately 400 km above Earth."
-  },
-  {
-    question: "What unit would you use to measure the length of a ruler?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex:0,
-    explanation: "Rulers are typically 30 centimeters long."
-  },
-  {
-    question: "Which unit is most appropriate for measuring the height of a giraffe?",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex:1,
-    explanation: "Giraffes are several meters tall."
-  },
-  {
-    question: "The distance a bicycle travels in one hour is best measured in:",
-    type: "mc",
-    options: ["centimeters", "meters", "kilometers"],
-    correctIndex:2,
-    explanation: "Bicycles travel kilometers in an hour."
-  }
-];
-shuffleArray(questions);
+      // Existing 26 Questions
+      {
+        question: "What is the most suitable unit to measure the length of a pencil?",
+        type: "mc",
+        options: ["centimeter (cm)", "meter (m)", "kilometer (km)"],
+        correctIndex: 0,
+        explanation: "A pencil is typically measured in centimeters."
+      },
+      {
+        question: "The distance between two big cities is usually measured in:",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 2,
+        explanation: "Distances between large cities span tens or hundreds of kilometers."
+      },
+      {
+        question: "Which unit would you use to measure your classroom’s length?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 1,
+        explanation: "A classroom's length is usually in a few meters."
+      },
+      {
+        question: "The distance from India to Sri Lanka is best measured in:",
+        type: "mc",
+        options: ["meters", "centimeters", "kilometers"],
+        correctIndex: 2,
+        explanation: "Countries are separated by distances that are typically in kilometers."
+      },
+      {
+        question: "Which unit would you use to measure the height of a single-story building?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 1,
+        explanation: "A building's height is typically a few meters."
+      },
+      {
+        question: "Which unit is best for measuring the length of a smartphone?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 0,
+        explanation: "Phones are typically ~15 cm tall."
+      },
+      {
+        question: "Which unit would you use to measure the width of a road?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 1,
+        explanation: "Road width is usually a few meters."
+      },
+      {
+        question: "Which unit would you use to measure the height of a tree?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 1,
+        explanation: "Trees are generally some meters tall."
+      },
+      {
+        question: "The distance of a marathon is usually measured in:",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 2,
+        explanation: "Marathons are about 42 km in distance."
+      },
+      {
+        question: "Which unit is best for measuring the length of a bed?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 1,
+        explanation: "Beds are typically a couple of meters in length."
+      },
+      {
+        question: "The height of a basketball hoop is about 3.05 of which unit?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 1,
+        explanation: "Official basketball hoop height is about 3.05 meters."
+      },
+      {
+        question: "Which scenario is best for 'centimeters' measurement?",
+        type: "mc",
+        options: [
+          "Measuring a coin’s diameter",
+          "Measuring a classroom",
+          "Measuring the distance between cities"
+        ],
+        correctIndex: 0,
+        explanation: "Coins are measured in centimeters."
+      },
+      {
+        question: "Which unit best describes your body height?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 1,
+        explanation: "We often say 'I am 1.7 meters tall'."
+      },
+      {
+        question: "Which unit would you use to measure the height of Burj Khalifa?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 1,
+        explanation: "The Burj Khalifa is about 828 meters tall."
+      },
+      {
+        question: "Which unit would you use to measure the distance between Mumbai and Delhi?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 2,
+        explanation: "Mumbai to Delhi is roughly 1400 km."
+      },
+      {
+        question: "Which unit would you use to measure the height of the Statue of Unity in India?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 1,
+        explanation: "Statue of Unity is about 182 meters tall."
+      },
+      {
+        question: "Which unit would you use to measure the length of the Great Wall of China?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 2,
+        explanation: "The Great Wall is over 21,000 km long."
+      },
+      {
+        question: "Which unit would you use to measure the height of the Eiffel Tower?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 1,
+        explanation: "Eiffel Tower is ~324 meters tall."
+      },
+      {
+        question: "Which unit would you use to measure the height of the tallest bird, the Ostrich?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex: 1,
+        explanation: "Ostriches can be nearly 2.8 meters tall."
+      },
+      {
+        question: "The length of a football pitch is usually measured in:",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex:1,
+        explanation: "Football pitch length is typically in meters."
+      },
+      {
+        question: "Which unit is best for measuring the height of a door?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex:1,
+        explanation: "Doors are measured in meters."
+      },
+      {
+        question: "Which unit would you use to measure the length of a hallway?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex:1,
+        explanation: "Hallways are measured in meters."
+      },
+      {
+        question: "The distance between the Earth and the International Space Station is approximately:",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex:2,
+        explanation: "The ISS orbits approximately 400 km above Earth."
+      },
+      {
+        question: "What unit would you use to measure the length of a ruler?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex:0,
+        explanation: "Rulers are typically 30 centimeters long."
+      },
+      {
+        question: "Which unit is most appropriate for measuring the height of a giraffe?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex:1,
+        explanation: "Giraffes are several meters tall."
+      },
+      {
+        question: "The distance a bicycle travels in one hour is best measured in:",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex:2,
+        explanation: "Bicycles travel kilometers in an hour."
+      },
+      // Additional 4 Questions
+      {
+        question: "What unit would you use to measure the length of a pencil case?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex:0,
+        explanation: "A pencil case is typically measured in centimeters."
+      },
+      {
+        question: "The distance you walk to school is usually measured in:",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex:1,
+        explanation: "Walking distances to school are usually in meters."
+      },
+      {
+        question: "Which unit would you use to measure the height of a basketball player?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex:1,
+        explanation: "Basketball players are measured in meters."
+      },
+      {
+        question: "What unit would you use to measure the length of a soccer goal?",
+        type: "mc",
+        options: ["centimeters", "meters", "kilometers"],
+        correctIndex:1,
+        explanation: "Soccer goals are typically measured in meters."
+      }
+    ];
+    shuffleArray(questions);
     const totalQuestions = 30;
     let totalTime = 720; // 12 minutes in seconds
     let currentQuestionIndex = 0;
     let score = 0;
     let playerName = "";
+    let division = "";
+    let rollNo = "";
     let mode = "check";
     let timerInterval = null;
+    let userKey = "";
     const introDiv        = document.getElementById("intro");
     const quizAreaDiv     = document.getElementById("quiz-area");
     const resultAreaDiv   = document.getElementById("result-area");
     const playerNameInput = document.getElementById("playerName");
+    const divisionSelect  = document.getElementById("division");
+    const rollNoInput     = document.getElementById("rollNo");
     const timerEl         = document.getElementById("timer");
     const scoreboardEl    = document.getElementById("scoreboard");
     const progressFillEl  = document.getElementById("progress-fill");
@@ -486,19 +568,48 @@ shuffleArray(questions);
     const mainBtn         = document.getElementById("mainBtn");
     const finalMessageEl  = document.getElementById("final-message");
     const finalScoreEl    = document.getElementById("final-score");
+    const scoreboardBody  = document.getElementById("scoreboard-body");
     const selectedAnswers = [];
+
     function startQuiz(){
       const nameVal = playerNameInput.value.trim();
+      const divisionVal = divisionSelect.value;
+      const rollNoVal = rollNoInput.value.trim();
       if(!nameVal){
-        alert("Please enter your name first.");
+        alert("Please enter your name.");
+        return;
+      }
+      if(!divisionVal){
+        alert("Please select your division.");
+        return;
+      }
+      if(!rollNoVal){
+        alert("Please enter your roll number.");
         return;
       }
       playerName = nameVal;
+      division = divisionVal;
+      rollNo = rollNoVal;
+      userKey = `${division}_${rollNo}`;
       introDiv.classList.add("hidden");
       quizAreaDiv.classList.remove("hidden");
       startTimer();
       showQuestion();
+      // Initialize or reset user data in Firebase
+      const initialData = {
+        name: playerName,
+        division: division,
+        rollNo: rollNo,
+        score: 0,
+        questionsCompleted: 0,
+        quiz: "measure1",
+        timeStarted: new Date().toISOString(),
+        lastAnswered: new Date().toISOString(),
+        totalQuestions: totalQuestions
+      };
+      database.ref(`results/${userKey}`).set(initialData);
     }
+
     function startTimer(){
       updateTimerUI();
       timerInterval = setInterval(()=>{
@@ -511,11 +622,13 @@ shuffleArray(questions);
         updateTimerUI();
       },1000);
     }
+
     function updateTimerUI(){
       const minutes = Math.floor(totalTime / 60);
       const seconds = totalTime % 60;
       timerEl.textContent = `Time: ${minutes}:${seconds < 10 ? "0"+seconds : seconds}`;
     }
+
     function showQuestion(){
       feedbackEl.classList.add("hidden");
       explanationEl.classList.add("hidden");
@@ -544,6 +657,7 @@ shuffleArray(questions);
         });
       }
     }
+
     function mainButtonClicked(){
       if(mode === "check"){
         checkAnswer();
@@ -551,6 +665,7 @@ shuffleArray(questions);
         nextQuestion();
       }
     }
+
     function checkAnswer(){
       let q = questions[currentQuestionIndex];
       let isCorrect = false;
@@ -565,6 +680,7 @@ shuffleArray(questions);
         selectedAnswers.push(chosenIndex);
       }
       if(isCorrect) score += 10;
+      let questionsCompleted = currentQuestionIndex + 1;
       scoreboardEl.textContent = "Score: " + score;
       feedbackEl.classList.remove("hidden");
       feedbackEl.textContent = isCorrect ? "Correct!" : "Incorrect!";
@@ -581,7 +697,17 @@ shuffleArray(questions);
       mode = "next";
       let progressPercent = Math.round(((currentQuestionIndex +1) / totalQuestions) * 100);
       progressFillEl.style.width = progressPercent + "%";
+      
+      // Update score and questionsCompleted in Firebase after each answer
+      const timestamp = new Date().toISOString();
+      const updateData = {
+        score: score,
+        questionsCompleted: questionsCompleted,
+        lastAnswered: timestamp
+      };
+      database.ref(`results/${userKey}`).update(updateData);
     }
+
     function nextQuestion(){
       currentQuestionIndex++;
       if(currentQuestionIndex >= totalQuestions){
@@ -590,12 +716,22 @@ shuffleArray(questions);
         showQuestion();
       }
     }
+
     function endQuiz(){
       clearInterval(timerInterval);
       quizAreaDiv.classList.add("hidden");
       resultAreaDiv.classList.remove("hidden");
       finalMessageEl.textContent = `Well done, ${playerName}!`;
       finalScoreEl.textContent = `Your final score: ${score} out of ${totalQuestions * 10}`;
+      // Update final result in Firebase
+      const timestamp = new Date().toISOString();
+      const finalResultData = {
+        finalScore: score,
+        timeEnded: timestamp,
+        totalTime: 720 - totalTime,
+        questionsCompleted: totalQuestions
+      };
+      database.ref(`results/${userKey}`).update(finalResultData);
     }
   </script>
 </body>
